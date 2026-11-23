@@ -1,15 +1,16 @@
+FROM node:20-bookworm-slim
 
-FROM fedora:37
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN sudo dnf -y update &&\
-    sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm &&\
-    sudo dnf install -y git ffmpeg ImageMagick nodejs libwebp yarnpkg &&\
-    sudo dnf clean all -y
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg imagemagick webp git ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /nezuko
+WORKDIR /app
 
-COPY . /nezuko
+COPY package.json ./
+RUN npm install --omit=dev
 
-RUN yarn
+COPY . .
 
-CMD ["yarn", "start"]
+CMD ["npm", "start"]
