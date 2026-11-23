@@ -30,3 +30,16 @@ Static inspection of the obfuscated plugin source found embedded third-party acc
 - Official migration guide: https://whiskey.so/migrate-latest
 - Official Baileys repository: https://github.com/WhiskeySockets/Baileys
 - Official package: https://www.npmjs.com/package/@whiskeysockets/baileys
+
+## Additional static inventory (2026-11-23)
+
+The readable bootstrap section confirms these concrete migration points:
+
+- `index.js` imports the legacy package synchronously with CommonJS and calls `useSingleFileAuthState('session.json')`.
+- It constructs the socket with `printQRInTerminal: true`, binds `makeInMemoryStore`, and registers `creds.update` to the old single-file save callback.
+- The bootstrap directly uses `generateForwardMessageContent`, `prepareWAMessageMedia`, `generateWAMessageFromContent`, `downloadContentFromMessage`, `jidDecode`, and `proto.*.fromObject`.
+- `lib/module.js` also synchronously requires `@adiwajshing/baileys`. The obfuscated `plugin.js` obtains a set of message/protobuf helpers through this module and uses `prepareMessageFromContent`, `areJidsSameUser`, and `getContentType` in addition to the helpers above.
+- The current plugin loader is a CommonJS `require('./plugin')` call inside the message event handler. This means merely changing the bootstrap import to dynamic ESM import would not complete the migration.
+- The current Dockerfile uses Fedora 37 and the distro-provided Node.js package, so its Node version is not reliably pinned to the required major version.
+
+These findings make a package-only upgrade or a small compatibility alias unsafe. A verified migration needs a reviewed replacement or readable source for the plugin layer, plus a deliberate auth-state migration and command regression tests.
