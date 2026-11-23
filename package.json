@@ -87,5 +87,8 @@
     "url": "https://github.com/ALPHAkaveen/v8-bot-yakuza/issues"
   },
   "homepage": "https://github.com/ALPHAkaveen/v8-bot-yakuza/#readme",
-  "main": "index.js"
+  "main": "index.js",
+  "engines": {
+    "node": ">=20"
+  }
 }
